@@ -11,8 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-#include <iostream>
-#include <sstream>
+
 #include "SockBaseSocket.hpp"
 #include "SockSocketError.hpp"
 
@@ -24,11 +23,7 @@ BaseSocket::BaseSocket()
 {
     m_socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(m_socket == INVALID_SOCKET)
-    {
-        std::ostringstream log;
-        log << "BaseSocket::BaseSocket: creating socket failed with error: " << WSAGetLastError();
-        throw SocketError(log.str());
-    }
+        throw LastError("Create socket failed");
 }
 
 BaseSocket::BaseSocket(SOCKET p_socketFd)
@@ -43,7 +38,7 @@ BaseSocket::~BaseSocket()
         try
         {
             close();
-        } catch(const SocketError&)
+        } catch(const Error&)
         {
         }
     }
@@ -53,21 +48,15 @@ void BaseSocket::closeConnection()
 {
     if(::shutdown(m_socket, SD_BOTH) != 0)
     {
-        std::ostringstream log;
-        log << "BaseSocket::closeConnection: shutdown failed with error: " << WSAGetLastError();
         close();
-        throw SocketError(log.str());
+        throw LastError("Shutdown socket failed");
     }
 }
 
 void BaseSocket::close()
 {
     if(::closesocket(m_socket) !=0)
-    {
-        std::ostringstream log;
-        log << "BaseSocket::close: closesocket failed with error: " << WSAGetLastError();
-        throw SocketError(log.str());
-    }
+        throw LastError("Close socket failed");
     m_socket = INVALID_SOCKET;
 }
 

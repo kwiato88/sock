@@ -11,7 +11,6 @@
 #include <sys/types.h>
 #include <netdb.h>
 #endif
-#include <sstream>
 #include <cstring>
 #include "SockListeningSocket.hpp"
 #include "SockSocketError.hpp"
@@ -31,10 +30,8 @@ void ListeningSocket::bind(std::string p_host, std::string p_port)
     int errorCode = ::getaddrinfo(p_host.c_str(), p_port.c_str(), &hint, &serwerAddr);
     if (errorCode != 0)
     {
-        std::ostringstream log;
-        log << "ClientSocket::connect: getaddrinfo failed with error: " << errorCode << " - " << ::gai_strerror(errorCode);
         close();
-        throw SocketError(log.str());
+		throw ResolveAddressError(std::string("Bind socket: failed to resolve address ") + p_host + "," + p_port, errorCode);
     }
 
     if(::bind(m_socket, serwerAddr->ai_addr, (int)serwerAddr->ai_addrlen) != 0)
@@ -43,22 +40,15 @@ void ListeningSocket::bind(std::string p_host, std::string p_port)
     }
     ::freeaddrinfo(serwerAddr);
     if (m_socket == INVALID_SOCKET)
-    {
-        std::ostringstream log;
-        log << "ListeningSocket::bind: bind failed with error: " << WSAGetLastError();
-        throw SocketError(log.str());
-    }
-
+        throw LastError("Bind socket to " + p_host + "," + p_port + " failed");
 }
 
 void ListeningSocket::listen(const int p_listeningQueueLength)
 {
     if (::listen(m_socket, p_listeningQueueLength) != 0)
     {
-        std::ostringstream log;
-        log << "ListeningSocket::listen: listen failed with error: " << WSAGetLastError();
         close();
-        throw SocketError(log.str());
+        throw LastError("Listening on socket failed");
     }
 }
 
@@ -67,10 +57,8 @@ boost::shared_ptr<ClientSocket> ListeningSocket::accept()
     SOCKET clientFd = ::accept(m_socket, NULL, NULL);
     if(clientFd == INVALID_SOCKET)
     {
-        std::ostringstream log;
-        log << "ListeningSocket::accept: accept failed with error: " << WSAGetLastError();
         close();
-        throw SocketError(log.str());
+        throw LastError("Accept client socket failed");
     }
     boost::shared_ptr<ClientSocket> client(new ClientSocket(clientFd));
     return client;

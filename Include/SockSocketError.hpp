@@ -1,6 +1,5 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE
-#ifndef SOCKETERROR_HPP_
-#define SOCKETERROR_HPP_
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -8,14 +7,26 @@
 namespace sock
 {
 
-struct SocketError: public std::runtime_error
+class Error: public std::runtime_error
 {
-    SocketError(std::string p_errorMsg);
+public:
+    Error(const std::string& p_what);
+
 };
 
-#ifndef _WIN32
-int WSAGetLastError();
-#endif
+class LastError : public Error
+{
+public:
+	LastError(const std::string& p_what);
 
-} /* namespace winSock */
-#endif /* SOCKETERROR_HPP_ */
+private:
+	int errorCode() const;
+};
+
+class ResolveAddressError : public Error
+{
+public:
+	ResolveAddressError(const std::string& p_what, int p_errorCode);
+};
+
+}

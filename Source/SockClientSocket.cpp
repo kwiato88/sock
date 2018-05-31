@@ -11,8 +11,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #endif
-#include <iostream>
-#include <sstream>
+
 #include <cstring>
 #include <memory>
 #include "SockClientSocket.hpp"
@@ -42,10 +41,8 @@ void ClientSocket::connect(std::string p_host, std::string p_port)
     int errorCode = ::getaddrinfo(p_host.c_str(), p_port.c_str(), &hint, &serwerAddr);
     if (errorCode != 0)
     {
-        std::ostringstream log;
-        log << "ClientSocket::connect: getaddrinfo failed with error: " << errorCode << " - " << ::gai_strerror(errorCode);
         close();
-        throw SocketError(log.str());
+		throw ResolveAddressError(std::string("Connect socket: failed to resolve address ") + p_host + "," + p_port, errorCode);
     }
 
     if(::connect( m_socket, serwerAddr->ai_addr, (int)serwerAddr->ai_addrlen) !=0)
@@ -54,21 +51,15 @@ void ClientSocket::connect(std::string p_host, std::string p_port)
     }
     ::freeaddrinfo(serwerAddr);
     if (m_socket == INVALID_SOCKET)
-    {
-        std::ostringstream log;
-        log << "ClientSocket::connect: connect failed with error: " << WSAGetLastError();
-        throw SocketError(log.str());
-    }
+        throw LastError("Connect socket to server " + p_host + "," + p_port + " failed");
 }
 
 void ClientSocket::send(Data p_sendBuff)
 {
     if(::send(m_socket, p_sendBuff.c_str(), p_sendBuff.length(), 0) == SOCKET_ERROR)
     {
-        std::ostringstream log;
-        log << "ClientSocket::send: send failed with error: " << WSAGetLastError();
         close();
-        throw SocketError(log.str());
+        throw LastError("Send data failed");
     }
 }
 
@@ -80,10 +71,8 @@ Data ClientSocket::receive(unsigned int p_maxLength)
     int bytesReceived = ::recv(m_socket, recvBuff.get(), p_maxLength, 0);
     if(bytesReceived < 0)
     {
-        std::ostringstream log;
-        log << "ClientSocket::receive: recv failed with error: " << WSAGetLastError();
         close();
-        throw SocketError(log.str());;
+        throw LastError("Receive data failed");
     }
     return bytesReceived == 0 ? Data() : Data(recvBuff.get(),recvBuff.get()+bytesReceived);
 }
