@@ -3,15 +3,8 @@
 #define _WIN32_WINNT 0x0501
 #endif
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#include <windows.h>
-#else
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netdb.h>
-#endif
 #include <cstring>
+#include "SockNative.hpp"
 #include "SockListeningSocket.hpp"
 #include "SockSocketError.hpp"
 #include "SockClientSocket.hpp"
@@ -60,8 +53,8 @@ boost::shared_ptr<ClientSocket> ListeningSocket::accept()
         close();
         throw LastError("Accept client socket failed");
     }
-    boost::shared_ptr<ClientSocket> client(new ClientSocket(clientFd));
+    boost::shared_ptr<ClientSocket> client(new ClientSocket(SocketFd(clientFd)));
     return client;
 }
 
-} /* namespace winSock */
+} 

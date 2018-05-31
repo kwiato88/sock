@@ -3,15 +3,7 @@
 #define _WIN32_WINNT 0x0501
 #endif
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#include <windows.h>
-#else
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
+#include "SockNative.hpp"
 #include "SockBaseSocket.hpp"
 #include "SockSocketError.hpp"
 
@@ -21,15 +13,14 @@ namespace sock
 BaseSocket::BaseSocket()
     : m_socket(INVALID_SOCKET)
 {
-    m_socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    m_socket = createNativeSocket();
     if(m_socket == INVALID_SOCKET)
         throw LastError("Create socket failed");
 }
 
-BaseSocket::BaseSocket(SOCKET p_socketFd)
-    : m_socket(p_socketFd)
-{
-}
+BaseSocket::BaseSocket(SocketFd p_socket)
+    : m_socket(p_socket)
+{}
 
 BaseSocket::~BaseSocket()
 {
@@ -46,7 +37,7 @@ BaseSocket::~BaseSocket()
 
 void BaseSocket::closeConnection()
 {
-    if(::shutdown(m_socket, SD_BOTH) != 0)
+    if(shutdownNative(m_socket) != 0)
     {
         close();
         throw LastError("Shutdown socket failed");
@@ -55,16 +46,43 @@ void BaseSocket::closeConnection()
 
 void BaseSocket::close()
 {
-    if(::closesocket(m_socket) !=0)
-        throw LastError("Close socket failed");
-    m_socket = INVALID_SOCKET;
+	bool errorOccured = closeNative(m_socket) != 0;
+	m_socket = INVALID_SOCKET;
+	if (errorOccured)
+		throw LastError("Close socket failed");
 }
 
-} /* namespace winSock */
-
-#ifndef _WIN32
-int closesocket(sock::SOCKET p_socket)
+bool BaseSocket::isInvalid(SocketFd p_socket)
 {
-    return ::close(p_socket);
-}
+#ifndef _WIN32
+#define INVALID_SOCKET -1
 #endif
+	return p_socket == INVALID_SOCKET;
+}
+
+int BaseSocket::closeNative(SocketFd p_socket)
+{
+#ifdef _WIN32
+	return ::closesocket(p_socket);
+#else
+	return ::close(p_socket);
+#endif
+}
+
+int BaseSocket::shutdownNative(SocketFd p_socket)
+{
+#ifndef _WIN32
+#define SD_BOTH        SHUT_RDWR
+#endif
+	return ::shutdown(m_socket, SD_BOTH);
+}
+
+SocketFd BaseSocket::createNativeSocket()
+{
+#ifndef _WIN32
+#define IPPROTO_TCP    0
+#endif
+	return SocketFd(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
+}
+
+}

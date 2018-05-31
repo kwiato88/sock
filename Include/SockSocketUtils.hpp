@@ -7,4 +7,4 @@ namespace sock
 void init();
 void cleanup();
 
-} //winSock
+}

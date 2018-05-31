@@ -3,17 +3,9 @@
 #define _WIN32_WINNT 0x0501
 #endif
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#include <windows.h>
-#else
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netdb.h>
-#endif
-
 #include <cstring>
 #include <memory>
+#include "SockNative.hpp"
 #include "SockClientSocket.hpp"
 #include "SockSocketError.hpp"
 
@@ -25,7 +17,7 @@ ClientSocket::ClientSocket()
 {
 }
 
-ClientSocket::ClientSocket(SOCKET p_socketFd)
+ClientSocket::ClientSocket(SocketFd p_socketFd)
     : BaseSocket(p_socketFd)
 {
 }
@@ -77,4 +69,4 @@ Data ClientSocket::receive(unsigned int p_maxLength)
     return bytesReceived == 0 ? Data() : Data(recvBuff.get(),recvBuff.get()+bytesReceived);
 }
 
-} /* namespace winSock */
+}

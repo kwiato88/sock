@@ -1,6 +1,5 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE
-#ifndef LISTENINGSOCKET_HPP_
-#define LISTENINGSOCKET_HPP_
+#pragma once
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -33,6 +32,4 @@ public:
     static const int DEFAULT_LISTEN_QUEUE_LENGTH = 10;
 };
 
-} /* namespace winSock */
-
-#endif /* LISTENINGSOCKET_HPP_ */
+}
