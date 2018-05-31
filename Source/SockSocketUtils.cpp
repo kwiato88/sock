@@ -1,9 +1,11 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE */
 #ifdef _WIN32
 #include <winsock2.h>
+#endif
+
 #include "SockSocketError.hpp"
 #include "SockSocketUtils.hpp"
-#endif
+
 namespace sock
 {
 
