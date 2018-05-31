@@ -7,6 +7,17 @@
 namespace sock
 {
 
+class Addr
+{
+public:
+	Addr(const std::string& p_host, const std::string& p_port);
+	~Addr();
+	const addrinfo* operator->() const;
+	operator const addrinfo& () const;
+private:
+	struct addrinfo *addr;
+};
+
 class ClientSocket : public BaseSocket
 {
 public:
@@ -18,21 +29,21 @@ public:
     ClientSocket(SocketFd p_socketFd);
 
     /**
-     * @throw SocketError
+     * @throw ResolveAddressError, LastError
      */
-    void connect(std::string p_host, std::string p_port);
+    void connect(const std::string& p_host, const std::string& p_port);
 
     /**
-     * @throw SocketError
+     * @throw LastError
      */
     void send(Data p_sendBuff);
 
     /**
-     * @throw SocketError
+     * @throw LastError
      */
     Data receive(unsigned int p_maxLength = DEFAULT_MAX_DATA_LENGTH);
 
-    static const unsigned int DEFAULT_MAX_DATA_LENGTH = 512;
+    static const unsigned int DEFAULT_MAX_DATA_LENGTH = 1024;
 };
 
 }

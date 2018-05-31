@@ -9,8 +9,42 @@
 #include "SockClientSocket.hpp"
 #include "SockSocketError.hpp"
 
+#ifndef _WIN32
+#define SOCKET_ERROR -1
+#endif
+
 namespace sock
 {
+
+Addr::Addr(const std::string& p_host, const std::string& p_port)
+	: addr(nullptr)
+{
+	struct addrinfo hint;
+	::memset(&hint, 0, sizeof(hint));
+	hint.ai_family = AF_INET;
+	hint.ai_socktype = SOCK_STREAM;
+	hint.ai_protocol = IPPROTO_TCP;
+
+	int errorCode = ::getaddrinfo(p_host.c_str(), p_port.c_str(), &hint, &addr);
+	if (errorCode != 0)
+		throw ResolveAddressError(std::string("Failed to resolve address ") + p_host + "," + p_port, errorCode);
+}
+
+Addr::~Addr()
+{
+	if (addr != nullptr)
+		::freeaddrinfo(addr);
+}
+
+const addrinfo* Addr::operator->() const
+{
+	return addr;
+}
+
+Addr::operator const addrinfo& () const
+{
+	return *addr;
+}
 
 ClientSocket::ClientSocket()
     : BaseSocket()
@@ -19,31 +53,24 @@ ClientSocket::ClientSocket()
 
 ClientSocket::ClientSocket(SocketFd p_socketFd)
     : BaseSocket(p_socketFd)
-{
-}
+{}
 
-void ClientSocket::connect(std::string p_host, std::string p_port)
+void ClientSocket::connect(const std::string& p_host, const std::string& p_port)
 {
-    struct addrinfo *serwerAddr = NULL, hint;
-    ::memset( &hint, 0,  sizeof(hint) );
-    hint.ai_family = AF_INET;
-    hint.ai_socktype = SOCK_STREAM;
-    hint.ai_protocol = IPPROTO_TCP;
-    // Resolve the server address and port
-    int errorCode = ::getaddrinfo(p_host.c_str(), p_port.c_str(), &hint, &serwerAddr);
-    if (errorCode != 0)
-    {
-        close();
-		throw ResolveAddressError(std::string("Connect socket: failed to resolve address ") + p_host + "," + p_port, errorCode);
-    }
-
-    if(::connect( m_socket, serwerAddr->ai_addr, (int)serwerAddr->ai_addrlen) !=0)
-    {
-        close();
-    }
-    ::freeaddrinfo(serwerAddr);
-    if (m_socket == INVALID_SOCKET)
-        throw LastError("Connect socket to server " + p_host + "," + p_port + " failed");
+	try
+	{
+		Addr server(p_host, p_port);
+		if (::connect(m_socket, server->ai_addr, (int)server->ai_addrlen) != 0)
+		{
+			close();
+			throw LastError("Connect socket to server " + p_host + "," + p_port + " failed");
+		}
+	}
+	catch (ResolveAddressError&)
+	{
+		close();
+		throw;
+	}
 }
 
 void ClientSocket::send(Data p_sendBuff)
@@ -58,10 +85,10 @@ void ClientSocket::send(Data p_sendBuff)
 Data ClientSocket::receive(unsigned int p_maxLength)
 {
 	std::shared_ptr<char> recvBuff(new char[p_maxLength], std::default_delete<char[]>());
-    ::memset(recvBuff.get(),0,100);
+    ::memset(recvBuff.get(),0, p_maxLength);
 
     int bytesReceived = ::recv(m_socket, recvBuff.get(), p_maxLength, 0);
-    if(bytesReceived < 0)
+    if(bytesReceived == SOCKET_ERROR)
     {
         close();
         throw LastError("Receive data failed");

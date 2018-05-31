@@ -11,7 +11,6 @@ namespace sock
 {
 
 #ifndef _WIN32
-#define SOCKET_ERROR   -1 //TODO:
 typedef int SOCKET;
 #endif
 

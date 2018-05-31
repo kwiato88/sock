@@ -7,6 +7,10 @@
 #include "SockBaseSocket.hpp"
 #include "SockSocketError.hpp"
 
+#ifndef _WIN32
+#define INVALID_SOCKET -1
+#endif
+
 namespace sock
 {
 
@@ -14,7 +18,7 @@ BaseSocket::BaseSocket()
     : m_socket(INVALID_SOCKET)
 {
     m_socket = createNativeSocket();
-    if(m_socket == INVALID_SOCKET)
+    if(isInvalid(m_socket))
         throw LastError("Create socket failed");
 }
 
@@ -24,7 +28,7 @@ BaseSocket::BaseSocket(SocketFd p_socket)
 
 BaseSocket::~BaseSocket()
 {
-    if(m_socket != INVALID_SOCKET)
+    if(!isInvalid(m_socket))
     {
         try
         {
@@ -54,9 +58,6 @@ void BaseSocket::close()
 
 bool BaseSocket::isInvalid(SocketFd p_socket)
 {
-#ifndef _WIN32
-#define INVALID_SOCKET -1
-#endif
 	return p_socket == INVALID_SOCKET;
 }
 
