@@ -22,6 +22,7 @@ add_library(
     Source/SockClientSocket.cpp
     Source/SockListeningSocket.cpp
     Source/SockSocketUtils.cpp
+    Source/SockAddr.cpp
     Source/SockSocketError.cpp
 )
 
