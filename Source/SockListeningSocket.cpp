@@ -20,13 +20,13 @@ void ListeningSocket::bind(const std::string& p_host, const std::string& p_port)
 		Addr server(p_host, p_port);
 		if (::bind(m_socket, server->ai_addr, (int)server->ai_addrlen) != 0)
 		{
-			close();
+			safeClose();
 			throw LastError("Bind socket to " + p_host + "," + p_port + " failed");
 		}
 	}
 	catch (ResolveAddressError&)
 	{
-		close();
+		safeClose();
 		throw;
 	}
 }
@@ -35,7 +35,7 @@ void ListeningSocket::listen(const int p_listeningQueueLength)
 {
     if (::listen(m_socket, p_listeningQueueLength) != 0)
     {
-        close();
+		safeClose();
         throw LastError("Listening on socket failed");
     }
 }
@@ -45,7 +45,6 @@ std::unique_ptr<ClientSocket> ListeningSocket::accept()
     SocketFd client(::accept(m_socket, NULL, NULL));
     if(isInvalid(client))
     {
-        close();
         throw LastError("Accept client socket failed");
     }
 	return std::make_unique<ClientSocket>(SocketFd(client));

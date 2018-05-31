@@ -22,6 +22,7 @@ void SerwerSockMain()
 
 	cout << "Start accepting connections" << endl;
     auto client(listener.accept());
+	cout << "Connection accepted" << endl;
 
     recvBuff = client->receive();
     cout << "Received first msg:" << recvBuff << endl;

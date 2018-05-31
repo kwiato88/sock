@@ -33,6 +33,7 @@ protected:
 	BaseSocket(const BaseSocket&) = delete;
 	BaseSocket& operator=(const BaseSocket&) = delete;
     void close();
+	void safeClose();
 	bool isInvalid(SocketFd p_socket);
 
 private:

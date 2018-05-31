@@ -29,21 +29,14 @@ BaseSocket::BaseSocket(SocketFd p_socket)
 BaseSocket::~BaseSocket()
 {
     if(!isInvalid(m_socket))
-    {
-        try
-        {
-            close();
-        } catch(const Error&)
-        {
-        }
-    }
+		safeClose();
 }
 
 void BaseSocket::closeConnection()
 {
     if(shutdownNative(m_socket) != 0)
     {
-        close();
+		safeClose();
         throw LastError("Shutdown socket failed");
     }
 }
@@ -54,6 +47,12 @@ void BaseSocket::close()
 	m_socket = INVALID_SOCKET;
 	if (errorOccured)
 		throw LastError("Close socket failed");
+}
+
+void BaseSocket::safeClose()
+{
+	closeNative(m_socket);
+	m_socket = INVALID_SOCKET;
 }
 
 bool BaseSocket::isInvalid(SocketFd p_socket)

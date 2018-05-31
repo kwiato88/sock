@@ -19,8 +19,7 @@ namespace sock
 
 ClientSocket::ClientSocket()
     : BaseSocket()
-{
-}
+{}
 
 ClientSocket::ClientSocket(SocketFd p_socketFd)
     : BaseSocket(p_socketFd)
@@ -33,13 +32,13 @@ void ClientSocket::connect(const std::string& p_host, const std::string& p_port)
 		Addr server(p_host, p_port);
 		if (::connect(m_socket, server->ai_addr, (int)server->ai_addrlen) != 0)
 		{
-			close();
+			safeClose();
 			throw LastError("Connect socket to server " + p_host + "," + p_port + " failed");
 		}
 	}
 	catch (ResolveAddressError&)
 	{
-		close();
+		safeClose();
 		throw;
 	}
 }
@@ -48,7 +47,7 @@ void ClientSocket::send(Data p_sendBuff)
 {
     if(::send(m_socket, p_sendBuff.c_str(), p_sendBuff.length(), 0) == SOCKET_ERROR)
     {
-        close();
+		safeClose();
         throw LastError("Send data failed");
     }
 }
@@ -61,7 +60,7 @@ Data ClientSocket::receive(unsigned int p_maxLength)
     int bytesReceived = ::recv(m_socket, recvBuff.get(), p_maxLength, 0);
     if(bytesReceived == SOCKET_ERROR)
     {
-        close();
+		safeClose();
         throw LastError("Receive data failed");
     }
     return bytesReceived == 0 ? Data() : Data(recvBuff.get(),recvBuff.get()+bytesReceived);
