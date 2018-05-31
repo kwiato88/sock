@@ -8,32 +8,27 @@
 #include "SockListeningSocket.hpp"
 #include "SockSocketError.hpp"
 #include "SockClientSocket.hpp"
+#include "SockAddr.hpp"
 
 namespace sock
 {
 
-void ListeningSocket::bind(std::string p_host, std::string p_port)
+void ListeningSocket::bind(const std::string& p_host, const std::string& p_port)
 {
-    struct addrinfo *serwerAddr = NULL, hint;
-    ::memset( &hint, 0,  sizeof(hint) );
-    hint.ai_family = AF_INET;
-    hint.ai_socktype = SOCK_STREAM;
-    hint.ai_protocol = IPPROTO_TCP;
-    // Resolve the server address and port
-    int errorCode = ::getaddrinfo(p_host.c_str(), p_port.c_str(), &hint, &serwerAddr);
-    if (errorCode != 0)
-    {
-        close();
-		throw ResolveAddressError(std::string("Bind socket: failed to resolve address ") + p_host + "," + p_port, errorCode);
-    }
-
-    if(::bind(m_socket, serwerAddr->ai_addr, (int)serwerAddr->ai_addrlen) != 0)
-    {
-        close();
-    }
-    ::freeaddrinfo(serwerAddr);
-    if (m_socket == INVALID_SOCKET)
-        throw LastError("Bind socket to " + p_host + "," + p_port + " failed");
+	try
+	{
+		Addr server(p_host, p_port);
+		if (::bind(m_socket, server->ai_addr, (int)server->ai_addrlen) != 0)
+		{
+			close();
+			throw LastError("Bind socket to " + p_host + "," + p_port + " failed");
+		}
+	}
+	catch (ResolveAddressError&)
+	{
+		close();
+		throw;
+	}
 }
 
 void ListeningSocket::listen(const int p_listeningQueueLength)
@@ -45,16 +40,15 @@ void ListeningSocket::listen(const int p_listeningQueueLength)
     }
 }
 
-boost::shared_ptr<ClientSocket> ListeningSocket::accept()
+std::unique_ptr<ClientSocket> ListeningSocket::accept()
 {
-    SOCKET clientFd = ::accept(m_socket, NULL, NULL);
-    if(clientFd == INVALID_SOCKET)
+    SocketFd client(::accept(m_socket, NULL, NULL));
+    if(isInvalid(client))
     {
         close();
         throw LastError("Accept client socket failed");
     }
-    boost::shared_ptr<ClientSocket> client(new ClientSocket(SocketFd(clientFd)));
-    return client;
+	return std::make_unique<ClientSocket>(SocketFd(client));
 }
 
 } 

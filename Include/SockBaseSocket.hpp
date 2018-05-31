@@ -33,12 +33,12 @@ protected:
 	BaseSocket(const BaseSocket&) = delete;
 	BaseSocket& operator=(const BaseSocket&) = delete;
     void close();
+	bool isInvalid(SocketFd p_socket);
 
 private:
 	int closeNative(SocketFd p_socket);
 	int shutdownNative(SocketFd p_socket);
 	SocketFd createNativeSocket();
-	bool isInvalid(SocketFd p_socket);
 
 protected:
 	SocketFd m_socket;

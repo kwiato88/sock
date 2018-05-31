@@ -2,7 +2,7 @@
 #pragma once
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "SockBaseSocket.hpp"
 
 namespace sock
@@ -15,19 +15,19 @@ class ListeningSocket: public BaseSocket
 public:
 
     /**
-     * @throw SocketError
+     * @throw ResolveAddressError, LastError
      */
-    void bind(std::string p_host, std::string p_port);
+    void bind(const std::string& p_host, const std::string& p_port);
 
     /**
-     * @throw SocketError
+     * @throw LastError
      */
     void listen(const int p_listeningQueueLength = DEFAULT_LISTEN_QUEUE_LENGTH);
 
     /**
-     * @throw SocketError
+     * @throw LastError
      */
-    boost::shared_ptr<ClientSocket> accept();
+    std::unique_ptr<ClientSocket> accept();
 
     static const int DEFAULT_LISTEN_QUEUE_LENGTH = 10;
 };

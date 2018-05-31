@@ -1,7 +1,7 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE
 #include <iostream>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "SockListeningSocket.hpp"
 #include "SockSocketUtils.hpp"
 #include "SockClientSocket.hpp"
@@ -21,7 +21,7 @@ void SerwerSockMain()
     listener.listen();
 
 	cout << "Start accepting connections" << endl;
-    boost::shared_ptr<sock::ClientSocket> client = listener.accept();
+    auto client(listener.accept());
 
     recvBuff = client->receive();
     cout << "Received first msg:" << recvBuff << endl;
