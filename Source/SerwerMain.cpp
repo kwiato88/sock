@@ -37,10 +37,8 @@ void SerwerSockMain()
     cout << "Send response: " << sendBuff << endl;
     client->send(sendBuff);
 
-	//cout << "Close connection" << endl;
-    //client->closeConnection();
-	recvBuff = client->receive();
-	cout << "Received third msg:" << recvBuff << endl;
+	cout << "Close connection" << endl;
+    client->closeConnection();
 }
 
 int main()
