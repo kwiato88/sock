@@ -14,50 +14,57 @@ void ClientSockMain()
     static const string port = "1234";
     sock::Data sendBuff;
     sock::Data recvBuff;
-    boost::shared_ptr<sock::ClientSocket> client(new sock::ClientSocket());
+    sock::ClientSocket client;
 
-    client->connect(host, port);
+	cout << "Start connection to server on host: " << host << ", port: " << port << endl;
+    client.connect(host, port);
 
     sendBuff = "first msg";
-    cout << "send first mesg: " << sendBuff << endl;
-    client->send(sendBuff);
-    recvBuff = client->receive();
+    cout << "Send first msg: " << sendBuff << endl;
+    client.send(sendBuff);
+    recvBuff = client.receive();
     if(recvBuff.empty())
     {
-        cout << "connection closed" << endl;
+        cout << "Connection closed by server" << endl;
         return;
     }
-    cout << "received first msg: " << recvBuff << endl;
-
+    cout << "Received first msg: " << recvBuff << endl;
 
     sendBuff = "secnd msg";
-    cout << "send second msg: " << sendBuff << endl;
-    client->send(sendBuff);
-    recvBuff = client->receive();
+    cout << "Send second msg: " << sendBuff << endl;
+    client.send(sendBuff);
+    recvBuff = client.receive();
     if(recvBuff.empty())
     {
-        cout << "connection closed" << endl;
+        cout << "Connection closed by server" << endl;
         return;
     }
-    cout << "received second msg: " << recvBuff << endl;
+    cout << "Received second msg: " << recvBuff << endl;
 
-    recvBuff = client->receive();
+    recvBuff = client.receive();
     if(!recvBuff.empty())
     {
-        cout << "connection not closed" << endl;
-        cout << "received data: " << recvBuff << endl;
-        client->closeConnection();
-        cout << "client closed connection" << endl;
+        cout << "Connection not closed by server" << endl;
+        cout << "Received msg: " << recvBuff << endl;
+		cout << "Close connection to server" << endl;
+        client.closeConnection();
     }
     else
-        cout << "connection closed" << endl;
+        cout << "Connection closed by server" << endl;
 }
 
 int main()
 {
-    sock::init();
-    ClientSockMain();
-    sock::cleanup();
+	try
+	{
+		sock::init();
+		ClientSockMain();
+		sock::cleanup();
+	}
+	catch (exception& e)
+	{
+		cout << "Error occured. Details: " << e.what() << endl;
+	}
 
     return 0;
 }

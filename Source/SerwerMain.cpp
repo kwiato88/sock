@@ -14,34 +14,45 @@ void SerwerSockMain()
     static const string port = "1234";
     sock::Data sendBuff;
     sock::Data recvBuff;
-    boost::shared_ptr<sock::ListeningSocket> listener(new sock::ListeningSocket());
+    sock::ListeningSocket listener;
 
-    listener->bind(host, port);
-    listener->listen();
-    boost::shared_ptr<sock::ClientSocket> client = listener->accept();
+	cout << "Setup server on host: " << host << ", port: " << port << endl;
+    listener.bind(host, port);
+    listener.listen();
+
+	cout << "Start accepting connections" << endl;
+    boost::shared_ptr<sock::ClientSocket> client = listener.accept();
 
     recvBuff = client->receive();
-    cout << "received first msg:" << recvBuff << endl;
+    cout << "Received first msg:" << recvBuff << endl;
     sendBuff = recvBuff;
     sendBuff += " OK";
-    cout << "send response: " << sendBuff << endl;
+    cout << "Send response: " << sendBuff << endl;
     client->send(sendBuff);
 
     recvBuff = client->receive();
-    cout << "received second msg:" << recvBuff << endl;
+    cout << "Received second msg:" << recvBuff << endl;
     sendBuff = recvBuff;
     sendBuff += " OK";
-    cout << "send response: " << sendBuff << endl;
+    cout << "Send response: " << sendBuff << endl;
     client->send(sendBuff);
 
+	cout << "Close connection" << endl;
     client->closeConnection();
 }
 
 int main()
 {
-    sock::init();
-    SerwerSockMain();
-    sock::cleanup();
+	try
+	{
+		sock::init();
+		SerwerSockMain();
+		sock::cleanup();
+	}
+	catch (exception& e)
+	{
+		cout << "Error occured. Deatils: " << e.what() << endl;
+	}
 
     return 0;
 }
