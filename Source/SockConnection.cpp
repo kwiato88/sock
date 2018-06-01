@@ -1,5 +1,6 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE
 #include "SockConnection.hpp"
+#include "SockSocketError.hpp"
 
 namespace sock
 {
@@ -22,7 +23,12 @@ void Connection::send(const Data& p_data)
 
 Data Connection::receive()
 {
-	return socket.receive();
+	auto received = socket.receive();
+	if (received.empty())
+	{
+		throw Error("Receive failed. Connection clised by peer");
+	}
+	return received;
 }
 
 }
