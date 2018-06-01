@@ -5,8 +5,53 @@
 #include "SockClientSocket.hpp"
 #include "SockSocketUtils.hpp"
 #include "SockListeningSocket.hpp"
+#include "SockConnection.hpp"
 
 using namespace std;
+
+void ClientConnectionMain()
+{
+	static const string host = "127.0.0.1";
+	static const string port = "1234";
+	sock::Data sendBuff;
+	sock::Data recvBuff;
+
+	cout << "Create connection to server" << endl;
+	sock::Connection conn(host, port);
+
+	sendBuff = "msgToSend 1";
+	cout << "Send first msg: " << sendBuff << endl;
+	conn.send(sendBuff);
+
+	recvBuff = conn.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
+	cout << "Received first msg: " << recvBuff << endl;
+
+	sendBuff = "msgToSend 2";
+	cout << "Send second msg: " << sendBuff << endl;
+	conn.send(sendBuff);
+
+	recvBuff = conn.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
+	cout << "Received second msg: " << recvBuff << endl;
+
+	recvBuff = conn.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
+	cout << "Received msg from server: " << recvBuff << endl;
+	cout << "Close connection (by destroying connection)" << endl;
+}
 
 void ClientSockMain()
 {
@@ -58,7 +103,8 @@ int main()
 	try
 	{
 		sock::init();
-		ClientSockMain();
+		//ClientSockMain();
+		ClientConnectionMain();
 		sock::cleanup();
 	}
 	catch (exception& e)

@@ -12,7 +12,7 @@ class ClientSocket : public BaseSocket
 public:
 
     /**
-     * @throw SocketError
+     * @throw LastError
      */
     ClientSocket();
     ClientSocket(SocketFd p_socketFd);

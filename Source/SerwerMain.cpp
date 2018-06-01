@@ -29,8 +29,8 @@ void SerwerSockMain()
     sendBuff = recvBuff;
     sendBuff += " OK";
     cout << "Send response: " << sendBuff << endl;
-    client->send(sendBuff);
-
+	client->send(sendBuff);
+	
     recvBuff = client->receive();
     cout << "Received second msg:" << recvBuff << endl;
     sendBuff = recvBuff;
