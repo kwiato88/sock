@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include "SockClientSocket.hpp"
 
 namespace sock
@@ -14,6 +15,7 @@ public:
 	* @throw Error
 	*/
 	Connection(const std::string& p_host, const std::string& p_port);
+	Connection(std::unique_ptr<ClientSocket> p_socket);
 	~Connection();
 	Connection(const Connection&) = delete;
 	Connection& operator=(const Connection&) = delete;
@@ -28,7 +30,7 @@ public:
 	Data receive();
 
 private:
-	ClientSocket socket;
+	std::unique_ptr<ClientSocket> socket;
 	bool isConnected;
 };
 

@@ -18,6 +18,7 @@ add_library(
     Source/SockAddr.cpp
     Source/SockSocketError.cpp
     Source/SockConnection.cpp
+    Source/SockServer.cpp
 )
 
 target_include_directories(
