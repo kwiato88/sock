@@ -54,15 +54,30 @@ void ClientSockMain()
     cout << "Send first msg: " << sendBuff << endl;
     client.send(sendBuff);
     recvBuff = client.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
     cout << "Received first msg: " << recvBuff << endl;
 
     sendBuff = "secnd msg";
     cout << "Send second msg: " << sendBuff << endl;
     client.send(sendBuff);
     recvBuff = client.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
     cout << "Received second msg: " << recvBuff << endl;
 
     recvBuff = client.receive();
+	if (recvBuff.empty())
+	{
+		cout << "Connection closed by server" << endl;
+		return;
+	}
     cout << "Received msg: " << recvBuff << endl;
 	cout << "Close connection to server" << endl;
     client.closeConnection();
