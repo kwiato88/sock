@@ -24,11 +24,6 @@ void ClientConnectionMain()
 	conn.send(sendBuff);
 
 	recvBuff = conn.receive();
-	if (recvBuff.empty())
-	{
-		cout << "Connection closed by server" << endl;
-		return;
-	}
 	cout << "Received first msg: " << recvBuff << endl;
 
 	sendBuff = "msgToSend 2";
@@ -36,20 +31,11 @@ void ClientConnectionMain()
 	conn.send(sendBuff);
 
 	recvBuff = conn.receive();
-	if (recvBuff.empty())
-	{
-		cout << "Connection closed by server" << endl;
-		return;
-	}
 	cout << "Received second msg: " << recvBuff << endl;
 
 	recvBuff = conn.receive();
-	if (recvBuff.empty())
-	{
-		cout << "Connection closed by server" << endl;
-		return;
-	}
 	cout << "Received msg from server: " << recvBuff << endl;
+
 	cout << "Close connection (by destroying connection)" << endl;
 }
 
