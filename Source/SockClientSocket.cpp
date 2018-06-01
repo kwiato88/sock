@@ -43,6 +43,23 @@ void ClientSocket::connect(const std::string& p_host, const std::string& p_port)
 	}
 }
 
+void ClientSocket::closeConnection()
+{
+	if (shutdownNative(m_socket) != 0)
+	{
+		safeClose();
+		throw LastError("Shutdown socket failed");
+	}
+}
+
+int ClientSocket::shutdownNative(SocketFd p_socket)
+{
+#ifndef _WIN32
+#define SD_BOTH        SHUT_RDWR
+#endif
+	return ::shutdown(m_socket, SD_BOTH);
+}
+
 void ClientSocket::send(Data p_sendBuff)
 {
     if(::send(m_socket, p_sendBuff.c_str(), p_sendBuff.length(), 0) == SOCKET_ERROR)

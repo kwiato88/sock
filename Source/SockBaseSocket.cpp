@@ -32,15 +32,6 @@ BaseSocket::~BaseSocket()
 		safeClose();
 }
 
-void BaseSocket::closeConnection()
-{
-    if(shutdownNative(m_socket) != 0)
-    {
-		safeClose();
-        throw LastError("Shutdown socket failed");
-    }
-}
-
 void BaseSocket::close()
 {
 	bool errorOccured = closeNative(m_socket) != 0;
@@ -67,14 +58,6 @@ int BaseSocket::closeNative(SocketFd p_socket)
 #else
 	return ::close(p_socket);
 #endif
-}
-
-int BaseSocket::shutdownNative(SocketFd p_socket)
-{
-#ifndef _WIN32
-#define SD_BOTH        SHUT_RDWR
-#endif
-	return ::shutdown(m_socket, SD_BOTH);
 }
 
 SocketFd BaseSocket::createNativeSocket()

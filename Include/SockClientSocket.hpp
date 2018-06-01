@@ -22,6 +22,11 @@ public:
      */
     void connect(const std::string& p_host, const std::string& p_port);
 
+	/**
+	* @throw LastError
+	*/
+	void closeConnection();
+
     /**
      * @throw LastError
      */
@@ -33,6 +38,9 @@ public:
     Data receive(unsigned int p_maxLength = DEFAULT_MAX_DATA_LENGTH);
 
     static const unsigned int DEFAULT_MAX_DATA_LENGTH = 1024;
+
+private:
+	int shutdownNative(SocketFd p_socket);
 };
 
 }

@@ -22,11 +22,6 @@ class BaseSocket
 public:
     virtual ~BaseSocket();
 
-    /**
-     * @throw LastError
-     */
-    void closeConnection();
-
 protected:
     BaseSocket();
     BaseSocket(SocketFd p_socket);
@@ -38,7 +33,6 @@ protected:
 
 private:
 	int closeNative(SocketFd p_socket);
-	int shutdownNative(SocketFd p_socket);
 	SocketFd createNativeSocket();
 
 protected:
