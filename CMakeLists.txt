@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(Sock)
 
 link_directories(
-    D:/boost_1_61_0/stage/lib
+    C:/Users/pikwiatk/boost_1_61_0/binMsvc
     D:/googletest-release-1.6.0/Build/Debug
     D:/googlemock-release-1.6.0/Build/Debug
 )
@@ -25,9 +25,9 @@ target_include_directories(
     libSock
     PUBLIC
     Include
-    D:/boost_1_61_0
-    D:/googletest-release-1.6.0/include
-    D:/googlemock-release-1.6.0/include
+    C:/Users/pikwiatk/boost_1_61_0
+    C:/Users/pikwiatk/googletest-release-1.6.0/include
+    C:/Users/pikwiatk/googlemock-release-1.6.0/include
 )
 
 add_executable(
@@ -39,9 +39,9 @@ target_include_directories(
     ServerEx
     PUBLIC
     Include
-    D:/boost_1_61_0
-    D:/googletest-release-1.6.0/include
-    D:/googlemock-release-1.6.0/include
+    C:/Users/pikwiatk/boost_1_61_0
+    C:/Users/pikwiatk/googletest-release-1.6.0/include
+    C:/Users/pikwiatk/googlemock-release-1.6.0/include
 )
 
 add_dependencies(
@@ -64,9 +64,9 @@ target_include_directories(
     ClientEx
     PUBLIC
     Include
-    D:/boost_1_61_0
-    D:/googletest-release-1.6.0/include
-    D:/googlemock-release-1.6.0/include
+    C:/Users/pikwiatk/boost_1_61_0
+    C:/Users/pikwiatk/googletest-release-1.6.0/include
+    C:/Users/pikwiatk/googlemock-release-1.6.0/include
 )
 
 add_dependencies(
