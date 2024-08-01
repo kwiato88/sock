@@ -1,7 +1,6 @@
 //This code is under MIT licence, you can find the complete file here: https://github.com/kwiato88/sock/blob/master/LICENSE
 #include <iostream>
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include "SockClientSocket.hpp"
 #include "SockSocketUtils.hpp"
 #include "SockListeningSocket.hpp"
